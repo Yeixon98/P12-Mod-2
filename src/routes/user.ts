@@ -29,7 +29,7 @@ class UserRoutes {
       age: req.body.age,
       email: req.body.email,
       password: req.body.password,
-    })
+    });
 
     newUser
       .save()
@@ -37,12 +37,20 @@ class UserRoutes {
         res.status(201).json(result);
       })
       .catch((err) => {
-        res.status(500).json({ message: err.erros ? err.errors.email ?  err.errors.email.message : err.message : err});
+        res
+          .status(500)
+          .json({
+            message: err.erros
+              ? err.errors.email
+                ? err.errors.email.message
+                : err.message
+              : err,
+          });
       });
   };
 
   putUser = (req: Request, res: Response) => {
-    User.findOneAndUpdate({email: req.query.email}, req.body, {
+    User.findOneAndUpdate({ email: req.query.email }, req.body, {
       new: true,
     })
       .then((result) => {
@@ -55,7 +63,7 @@ class UserRoutes {
   };
 
   deleteUser = (req: Request, res: Response) => {
-    User.findOneAndDelete({email: req.query.email})
+    User.findOneAndDelete({ email: req.query.email })
       .then((result) => {
         res.status(200).json(result);
       })

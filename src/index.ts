@@ -1,5 +1,3 @@
-import Server from './Server'
+import Server from "./Server";
 
-const server = new Server(5000)
-
-server.listen()
+new Server(5000).listen();
