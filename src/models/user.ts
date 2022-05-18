@@ -1,6 +1,7 @@
 import { model, Schema } from "mongoose";
 
-export interface UserI extends Document{
+// extends Document  NOOO -> https://mongoosejs.com/docs/typescript.html#using-extends-document
+export interface UserI{
   name: string;
   surname: string;
   age: number;
@@ -24,6 +25,7 @@ export const UserSchema = new Schema(
     },
     email: {
       type: String,
+      unique: true,
       required: true,
       match: [
         /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
