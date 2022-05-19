@@ -1,16 +1,22 @@
-import { model, Schema } from "mongoose";
+import { Document, model, Schema } from "mongoose";
 
-// extends Document  NOOO -> https://mongoosejs.com/docs/typescript.html#using-extends-document
-export interface UserI{
+export interface StudentI extends Document {
+  nif: string;
   name: string;
   surname: string;
   age: number;
   email: string;
-  password: string;
+  degree: string;
+  course: string[];
 }
 
-export const UserSchema = new Schema(
+export const StudentSchema = new Schema(
   {
+    nif: {
+      type: String,
+      required: true,
+      unique: true,
+    },
     name: {
       type: String,
       required: true,
@@ -25,21 +31,24 @@ export const UserSchema = new Schema(
     },
     email: {
       type: String,
-      unique: true,
       required: true,
       match: [
         /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
         "Please fill a valid email address",
       ],
     },
-    password: {
+    degree: {
       type: String,
       required: true,
     },
+    course: [{
+      type: String,
+      required: true
+    }]
   },
   {
     versionKey: false,
   }
 );
 
-export const User = model<UserI>("User", UserSchema);
+export const Student = model<StudentI>("Student", StudentSchema);

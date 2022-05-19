@@ -1,37 +1,13 @@
 import * as mongoose from "mongoose";
-import * as express from "express";
-import { Request, Response, Application } from "express";
-import * as morgan from "morgan";
-import { join } from "path";
-
-import routes from "./routes/index";
-import { User } from "./models/user";
+import { Student } from "./models/student";
+import { putStudent, postStudent } from "./types";
 
 export default class Server {
-  private app: Application;
-  constructor(private readonly port: number) {
-    this.app = express();
-    this.initApp();
+  constructor() {
     this.connectMongoDB();
   }
 
-  initApp = () => {
-    this.app.use(morgan("dev"));
-    this.app.use(express.json());
-    this.app.use(express.urlencoded({ extended: false }));
-    this.app.use(express.static(join(__dirname, "../public")));
-
-    this.app.use(routes);
-
-    if (process.env.NODE_ENV === "test") {
-      this.app.get("/reset", async (_: Request, res: Response) => {
-        await User.deleteMany({});
-        res.status(200).json({ message: "Reinicio..." });
-      });
-    }
-  };
-
-  connectMongoDB = () => {
+  private connectMongoDB = () => {
     let MONGODB_URI: string = `mongodb://tecno:tecno@127.0.0.1:21100/DSI-Mod`;
 
     if (process.env.NODE_ENV === "test") {
@@ -45,9 +21,62 @@ export default class Server {
       .catch(() => console.error("Error connecting to the database"));
   };
 
-  listen = () => {
-    this.app.listen(this.port, () => {
-      console.log("Server is running on port: " + this.port);
+  getStudent = (nif: string) => {
+    return new Promise<string>((resolve, reject) => {
+      const filter = nif ? { nif: nif } : {};
+      Student.find(filter)
+        .then(async (result) => { 
+          if (result.length > 0) resolve(JSON.stringify(result))
+          else resolve(JSON.stringify({message: 'Student/s not Found'}))
+        })
+        .catch((err) => {
+          reject(JSON.stringify({ error: err }))
+        });
     });
   };
+
+  postStudent = (request: postStudent) => {
+    return new Promise<string>((resolve, reject) => {
+      const newStudent = new Student(request);
+      newStudent.save()
+        .then((result) => {
+          resolve(JSON.stringify(result))
+        })
+        .catch((err) => {
+          reject(JSON.stringify({ error: err }))
+        });
+    });
+  };
+
+  putStudent = (request: putStudent) => {
+    return new Promise<string>((resolve, reject) => {
+      Student.findOneAndUpdate({ nif: request.nif }, request, {
+        new: true,
+      })
+        .then(async (result) => { 
+          if (result) resolve(JSON.stringify(result))
+          else resolve(JSON.stringify({message: 'Student not Found'}))
+        })
+        .catch((err) => {
+          reject(JSON.stringify({ error: err }))
+        });
+    });
+  };
+
+  deleteStudent = (nif: string) => {
+    return new Promise<string>((resolve, reject) => {
+      Student.findOneAndDelete({ nif: nif })
+        .then((result) => {
+          resolve(JSON.stringify(result))
+        })
+        .catch((err) => {
+          reject(JSON.stringify({ error: err }))
+        });
+    });
+  };
+
+  resetDB = async () => {
+    await Student.deleteMany({})
+    mongoose.disconnect()
+  }
 }
