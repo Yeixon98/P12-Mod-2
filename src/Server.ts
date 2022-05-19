@@ -10,11 +10,6 @@ export default class Server {
   private connectMongoDB = () => {
     let MONGODB_URI: string = `mongodb://tecno:tecno@127.0.0.1:21100/DSI-Mod`;
 
-    if (process.env.NODE_ENV === "test") {
-      console.log("============= TEST =============");
-      MONGODB_URI = `mongodb://tecno:tecno@127.0.0.1:21100/DSI-Mod-Test`;
-    }
-
     mongoose
       .connect(MONGODB_URI, { autoIndex: true })
       .then(() => console.log("Database connected!"))

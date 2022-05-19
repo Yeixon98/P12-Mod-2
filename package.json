@@ -4,8 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "server-dev": "tsc-watch --onSuccess \"node dist/index.js\"",
-    "server-test": "tsc && cross-env NODE_ENV=test node dist/index.js",
     "server": "tsc && node dist/index.js",
     "test": "mocha",
     "coverage": "nyc npm test && nyc report --reporter=lcov",
